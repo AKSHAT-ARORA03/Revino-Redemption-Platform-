@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ShoppingCart, Coins, Search, Filter } from "lucide-react"
+import { ShoppingCart, Search } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/components/auth-provider"
@@ -50,8 +50,7 @@ export default function CatalogClient() {
         const data = await response.json()
         const activeVouchers = data.filter((v: Voucher) => v.isActive)
         setVouchers(activeVouchers)
-        
-        // Extract unique categories
+
         const uniqueCategories = Array.from(
           new Set(activeVouchers.map((v: Voucher) => v.category))
         )
@@ -72,7 +71,6 @@ export default function CatalogClient() {
   const filterVouchers = () => {
     let filtered = vouchers
 
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (voucher) =>
@@ -81,12 +79,10 @@ export default function CatalogClient() {
       )
     }
 
-    // Category filter
     if (categoryFilter !== "all") {
       filtered = filtered.filter((voucher) => voucher.category === categoryFilter)
     }
 
-    // Price filter
     if (priceFilter !== "all") {
       switch (priceFilter) {
         case "low":
@@ -105,23 +101,16 @@ export default function CatalogClient() {
   }
 
   const handleRedeemClick = (voucherId: string) => {
-    // Check if user is logged in using the useAuth hook
     if (!user) {
-      // Redirect to login page with return URL to this specific voucher
       router.push(`/login?returnUrl=${encodeURIComponent(`/catalog?redeem=${voucherId}`)}`)
-      return;
+      return
     }
-    
-    // If user is logged in, redirect to purchase page
     router.push(`/employee/purchase-voucher/${voucherId}`)
   }
-  
-  // Check if we need to redirect to a specific voucher after login
+
   useEffect(() => {
-    const redeemVoucherId = searchParams.get('redeem')
+    const redeemVoucherId = searchParams.get("redeem")
     if (redeemVoucherId && user) {
-      // User is logged in and has a voucher ID in the URL
-      // Redirect to purchase page
       router.push(`/employee/purchase-voucher/${redeemVoucherId}`)
     }
   }, [searchParams, user, router])
@@ -167,8 +156,8 @@ export default function CatalogClient() {
             <SelectContent>
               <SelectItem value="all">All Prices</SelectItem>
               <SelectItem value="low">Low (≤ 100)</SelectItem>
-              <SelectItem value="medium">Medium (101-500)</SelectItem>
-              <SelectItem value="high">High (> 500)</SelectItem>
+              <SelectItem value="medium">Medium (101–500)</SelectItem>
+              <SelectItem value="high">High (&gt; 500)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -221,7 +210,9 @@ export default function CatalogClient() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Expires:</span>
-                      <span className="text-sm">{new Date(voucher.expiryDate).toLocaleDateString()}</span>
+                      <span className="text-sm">
+                        {new Date(voucher.expiryDate).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                   <Button
